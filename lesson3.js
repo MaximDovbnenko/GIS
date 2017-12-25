@@ -61,7 +61,28 @@ MatrixGroup.prototype = {
                 for(var i = 0; i < row; i++){
                     this.Matrix[i] = new  Array();
                     for(var j = 0; j < col; j++){
-                        this.Matrix[i][j] = this.empty;
+                        this.Matrix[i][j] = 0;
+                    }
+                }
+                for(var i = 0; i < this.row_length; i++){
+                    for(var j = 0; j < this.col_length; j++){
+                        this.get_next(i,j);
+                    }
+                }
+                for(var i = 0; i < this.row_length; i++){
+                    for(var j = 0; j < this.col_length; j++){
+                        var c = this.Matrix[i][j] + Math.floor(Math.random() * (350 - 100 + 1)) + 100;
+                        ;
+                        if(c < 0){
+                            this.Matrix[i][j] = this.water;
+                            continue;
+                        }else if( c> 0 && c < 100){
+                            this.Matrix[i][j] = this.erth;
+                            continue;
+                        }else{
+                            this.Matrix[i][j] = this.green;
+                            continue;
+                        }
                     }
                 }
                 return true;
@@ -69,9 +90,21 @@ MatrixGroup.prototype = {
         }
         return false;
     },
+    get_next: function(px,py){
+        var Rad = 1;
+        var height = 0.001;
+        for(var i = 0; i < this.row_length; i++){
+            for(var j = 0; j < this.col_length; j++){
+                var d = Rad * Rad -((px-i)*(px-i)+(py-j)*(py-j)); 
+                var val = d*height;
+                this.Matrix[i][j]+=d*height;
+            }
+        }
+    },
     loadDefault: function(matrix){
         canvas_elem.height = this.row_length * 32;
         canvas_elem.width  = this.col_length * 32;
+        
         this.Matrix = matrix;
     },
     drawMatrix: function(){
@@ -82,6 +115,31 @@ MatrixGroup.prototype = {
                 Canvas.fillRect(j * this.cell_x_size, i * this.cell_y_size, this.cell_x_size, this.cell_y_size);
             }
         }
+    },
+
+    //Расчет колличевства групп на карте(аозможно тут же буду считать и другоие праметры)
+    calculateGroup: function(){
+        var group = [0, 1, 2, 3, 4];
+        var mask  = this.create_empty_mask();
+        for(var g = 0; g < group.length; g++){
+            var current_group = group[g];
+            for(var i = 1; i < this.row_length - 1; i++){
+                for(var j = 1; j < this.col_length - 1; j++){
+                    
+                }
+            }
+        }
+    },
+    
+    create_empty_mask: function(){
+        var mask  = new  Array();
+        for(var i = 0; i < this.row_length; i++){
+            mask [i] = new  Array();
+            for(var j = 0; j < this.col_length; j++){
+                mask [i][j] = this.empty;
+            }
+        }
+        return mask;
     }
 };
 
@@ -89,6 +147,7 @@ function Edit(){
     this.StartMatrix = new MatrixGroup();
     this.EndMatrix   = new MatrixGroup();
     this.CurrentColor = -1;
+    this.CurrentCreate = 'start';
     this.is_need_load_default = false;
     this.init();
 }
@@ -101,10 +160,15 @@ Edit.prototype = {
         $('#tail-erth').on('click', function(){$this.CurrentColor = 2;});
         $('#tail-green').on('click', function(){$this.CurrentColor = 4;});
         $('#create-btn').on('click', function(){
-            if(!$this.is_need_load_default)
+            if(this.CurrentCreate = 'start'){
+                if(!$this.is_need_load_default)
                 $this.CreateStartMatrix();
             else
-                $this.CreateDefault();
+                $this.CreateDefaultStart();
+            }else{
+
+            }
+        
         });
         $('#draw_obj').on('mousedown', function(e){
             var m = mouse_coords(e);
@@ -136,8 +200,8 @@ Edit.prototype = {
             this.StartMatrix.drawMatrix();
         }
     },
-    CreateDefault: function() {
-       this.StartMatrix.loadDefault(DefaultStart);
+    CreateDefaultStart: function() {
+        this.StartMatrix.loadDefault(DefaultStart);
         $("#set-size").hide(1000);
         $(".map-container").show(1000);
         this.StartMatrix.drawMatrix();

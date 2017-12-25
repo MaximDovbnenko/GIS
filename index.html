@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Геоинформационные технологии</title>
+    <link href="bootstrap-4/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <header style="margin-bottom: 80px;">
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Задание 3</a>
+        <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          <ul class="navbar-nav mr-auto"></ul>
+        </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <h1 id="title-step"> Создайте начальную конфигурацию</h1>
+      <div id='set-size'>
+        <div class="row">
+          <div class="col-xs-4">
+            <label for="recipient-name" class="form-control-label inp">Кол. строк</label>
+            <input type="text" class="form-control inp" id="row-size">
+          </div>
+          <div class="col-xs-2" style="width:30px;"></div>
+          <div class="col-xs-4">
+            <label for="recipient-name" class="form-control-label inp">Кол.столбцов</label>
+            <input type="text" class="form-control inp" id="col-size">
+          </div>
+          <div class="col-xs-6">
+            <button id="create-btn" type="button" class="btn btn-primary">Создать</button>
+          </div>
+        </div>
+      <div id="table-coin-object">
+        <table class="table">
+            <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Тип объекта</th>
+                  <th>Обозначение</th>
+                  <th>Цена</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1</th>
+                  <td>Пусто</td>
+                  <td><div id="tail-empty-tb"></div></td>
+                  <td><input type="text" class="form-control" id="row-size"></td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Вода</td>
+                    <td><div id="tail-water-tb"></div></td>
+                    <td><input type="text" class="form-control" id="row-size"></td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Лесная зона</td>
+                    <td><div id="tail-green-tb"></div></td>
+                    <td><input type="text" class="form-control" id="row-size"></td>
+                  </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Земля</td>
+                    <td><div id="tail-erth-tb"></div></td>
+                    <td><input type="text" class="form-control" id="row-size"></td>
+                  </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>Застройка</td>
+                    <td><div id="tail-building-tb"></div></td>
+                    <td><input type="text" class="form-control" id="row-size"></td>
+                  </tr>
+              </tbody>
+        </table>
+      </div>
+      </div>
+        <div class="map-container" style="display:none;">
+          <div class="row">
+                <div id="tail-empty"></div>
+                <div id="tail-water"></div>
+                <div id="tail-erth"></div>
+                <div id="tail-building"></div>
+                <div id="tail-green"></div>
+          </div>
+          <canvas height='640' width='640' id='draw_obj' style="margin-top:20px;">Обновите</canvas>
+          <div class="row">
+              <button id="create-btn" type="button" class="btn btn-primary">Далее</button>
+          </div>
+          
+        </div>
+
+
+    <script src="Jquery/jquery.js"></script>
+    <script src="lesson3.js"></script>
+   
+  </body>
+</html>
+
+<style>
+  table {
+    margin-top: 50px;
+  }
+  #create-btn{
+    margin-top: 32px;
+    margin-left: 100px;
+  }
+  .inp {
+    margin-left: 20px;
+    text-align: center;
+  }
+  #set-size{
+    width: 658px;
+    height:104px;
+    border: 1px solid #e9ecef;
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  .map-container {
+    margin-bottom: 30px;
+    background-color:rgb(198, 200, 203);
+    width: 370px;
+    height:74px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-empty {
+    margin: 20px;
+    margin-left: 40px;
+    width:32px;
+    height:32px;
+    background-color:rgb(59, 61, 65);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-empty-tb {
+    width:32px;
+    height:32px;
+    background-color:rgb(59, 61, 65);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-green{
+    margin: 20px;
+    width:32px;
+    height:32px;
+    background-color:rgb(47, 228, 20);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-green-tb{
+    width:32px;
+    height:32px;
+    background-color:rgb(47, 228, 20);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-water {
+    margin: 20px;
+    width:32px;
+    height:32px;
+    background-color:rgb(8, 78, 228);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-water-tb{
+    width:32px;
+    height:32px;
+    background-color:rgb(8, 78, 228);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-building {
+    margin: 20px;
+    width:32px;
+    height:32px;
+    background-color:rgb(12, 47, 101);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-building-tb {
+    width:32px;
+    height:32px;
+    background-color:rgb(12, 47, 101);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-erth {
+    margin: 20px;
+    width:32px;
+    height:32px;
+    background-color:rgb(238, 173, 9);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-erth-tb {
+    width:32px;
+    height:32px;
+    background-color:rgb(238, 173, 9);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-empty:hover {
+    margin: 20px;
+    margin-left: 40px;
+    width:32px;
+    height:32px;
+    background-color:rgb(59, 61, 65);   
+    -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  #tail-green:hover{
+    width:40px;
+    height:40px; 
+  }
+  #tail-water:hover {
+    width:40px;
+    height:40px; 
+  }
+  #tail-building:hover {
+    width:40px;
+    height:40px; 
+  }
+  #tail-erth:hover {
+    width:40px;
+    height:40px;  
+  }
+  #tail-empty:hover  {
+    width:40px;
+    height:40px; 
+  }
+</style>

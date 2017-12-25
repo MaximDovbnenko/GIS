@@ -22,7 +22,7 @@
 
     <div class="container">
       <h1 id="title-step"> Создайте начальную конфигурацию</h1>
-      <div id='set-size'>
+      <div id='set-size' class="container-fluid">
         <div class="row">
           <div class="col-xs-4">
             <label for="recipient-name" class="form-control-label inp">Кол. строк</label>
@@ -33,8 +33,14 @@
             <label for="recipient-name" class="form-control-label inp">Кол.столбцов</label>
             <input type="text" class="form-control inp" id="col-size">
           </div>
+          <div class="col-xs-4">
+            <div class="checkbox">
+              <label><input id="check-default" type="checkbox" value="">Исп. карты по умолчанию
+              </label>
+            </div>
+          </div>
           <div class="col-xs-6">
-            <button id="create-btn" type="button" class="btn btn-primary">Создать</button>
+           
           </div>
         </div>
       <div id="table-coin-object">
@@ -52,35 +58,40 @@
                   <th scope="row">1</th>
                   <td>Пусто</td>
                   <td><div id="tail-empty-tb"></div></td>
-                  <td><input type="text" class="form-control" id="row-size"></td>
+                  <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
                 </tr>
                 <tr>
                     <th scope="row">2</th>
                     <td>Вода</td>
                     <td><div id="tail-water-tb"></div></td>
-                    <td><input type="text" class="form-control" id="row-size"></td>
+                    <td><input value="7" type="text" class="form-control row-size" id="row-size"></td>
                 </tr>
                 <tr>
                     <th scope="row">3</th>
                     <td>Лесная зона</td>
                     <td><div id="tail-green-tb"></div></td>
-                    <td><input type="text" class="form-control" id="row-size"></td>
+                    <td><input value="4"  type="text" class="form-control row-size" id="row-size"></td>
                   </tr>
                 <tr>
-                    <th scope="row">3</th>
+                    <th scope="row">4</th>
                     <td>Земля</td>
                     <td><div id="tail-erth-tb"></div></td>
-                    <td><input type="text" class="form-control" id="row-size"></td>
+                    <td><input value="3"  type="text" class="form-control row-size" id="row-size"></td>
                   </tr>
                 <tr>
-                    <th scope="row">3</th>
+                    <th scope="row">5</th>
                     <td>Застройка</td>
                     <td><div id="tail-building-tb"></div></td>
-                    <td><input type="text" class="form-control" id="row-size"></td>
+                    <td><input value="5"  type="text" class="form-control row-size" id="row-size"></td>
                   </tr>
               </tbody>
         </table>
       </div>
+      <div class="row">
+        <div class="col-xs-6">
+          <button id="create-btn" type="button" class="btn btn-primary">Создать</button>
+        </div>
+    </div>
       </div>
         <div class="map-container" style="display:none;">
           <div class="row">
@@ -92,7 +103,7 @@
           </div>
           <canvas height='640' width='640' id='draw_obj' style="margin-top:20px;">Обновите</canvas>
           <div class="row">
-              <button id="create-btn" type="button" class="btn btn-primary">Далее</button>
+             
           </div>
           
         </div>
@@ -105,22 +116,24 @@
 </html>
 
 <style>
+  .checkbox {
+    margin-left: 90px;
+    margin-top:  37px;
+  }
   table {
     margin-top: 50px;
   }
-  #create-btn{
-    margin-top: 32px;
-    margin-left: 100px;
-  }
   .inp {
-    margin-left: 20px;
+    margin-left: 50px;
     text-align: center;
   }
   #set-size{
-    width: 658px;
-    height:104px;
+    height:auto;
     border: 1px solid #e9ecef;
     -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  .row-size{
+    text-align: center;
   }
   .map-container {
     margin-bottom: 30px;

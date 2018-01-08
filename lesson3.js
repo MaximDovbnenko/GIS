@@ -418,6 +418,20 @@ Game.prototype = {
         $('#game-canvas').on('mousedown', function(e){
             $this.update_state(e);
         });
+        $('#append-to-tmp').on('click', function(){
+            $this._append_to_tmp();
+        });
+        this.update();
+    },
+    _append_to_tmp: function(){
+        var $this = this;
+        var integrate = this.calculate(this.TmpMatrix[this.ITR_STEP].tmp_matrix);
+        var row = $('<tr key='+ this.ITR_STEP  +'><th>Решение-'+ (this.ITR_STEP + 1) +'</th><td>'+ integrate +'</td><tr>').on('click', function(){
+
+        });
+        row.appendTo($('tbody', $('#tmp-table')));
+        this.ITR_STEP++;
+        this.TmpMatrix[$this.ITR_STEP].tmp_matrix = this.CurrentMatrix; 
         this.update();
     },
     _append_current_block: function(id){
@@ -460,25 +474,25 @@ Game.prototype = {
         var j = Math.floor((m.y) / 24) ; 
         this.current_i = i;
         this.current_j = j;
-        var current_mt_val = this.CurrentMatrix.Matrix[j][i];
+        var current_mt_val = this.TmpMatrix[this.ITR_STEP].tmp_matrix.Matrix[j][i];
         this._append_view(current_mt_val);
         this._append_current_block(current_mt_val);
         this.update();
     },
     update: function(){
-        var integrate = this.calculate(this.CurrentMatrix);
+        var integrate = this.calculate(this.TmpMatrix[this.ITR_STEP].tmp_matrix);
         $('#integrate').text(integrate);
         $('#count').text(this.LocalCounter);
         $('#itr_l').text(this.ITR_STEP);
         $('#itr').text(this.STEP);
         var offset = this.CurrentMatrix.col_length * this.CurrentMatrix.cell_x_size + 50;
-        this.CurrentMatrix.drawMatrix(0,  this.context);
+        this.TmpMatrix[this.ITR_STEP].tmp_matrix.drawMatrix(0,  this.context);
         this.EndMatrix.drawMatrix(offset, this.context);
     },
     calculate: function(matrix){
         var lambda_1 = 0;
         var calc_group_current = matrix.calculateGroup();
-        var calc_group_end     = matrix.calculateGroup();
+        var calc_group_end     = this.EndMatrix.calculateGroup();
         for(var i = 0; i < matrix.row_length; i++){
             for(var j = 0; j < matrix.col_length; j++){
                 if(matrix.Matrix[i][j] != this.EndMatrix.Matrix[i][j]){

@@ -60,41 +60,41 @@
                   <th scope="row">1</th>
                   <td>Пусто</td>
                   <td><div id="tail-empty-tb"></div></td>
-                  <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                  <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                  <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
+                  <td><input value="0" type="text" name="empty-price"  class="form-control row-size" id="row-size"></td>
+                  <td><input value="0" type="text" name="empty-create" class="form-control row-size" id="row-size"></td>
+                  <td><input value="0" type="text" name="empty-delete" class="form-control row-size" id="row-size"></td>
                 </tr>
                 <tr>
                     <th scope="row">2</th>
                     <td>Вода</td>
                     <td><div id="tail-water-tb"></div></td>
-                    <td><input value="7" type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
+                    <td><input value="0" type="text" name="water-price"  class="form-control row-size" id="row-size"></td>
+                  <td><input value="0" type="text" name="water-create" class="form-control row-size" id="row-size"></td>
+                  <td><input value="0" type="text" name="water-delete" class="form-control row-size" id="row-size"></td>
                   </tr>
                 <tr>
                     <th scope="row">3</th>
                     <td>Лесная зона</td>
                     <td><div id="tail-green-tb"></div></td>
-                    <td><input value="4"  type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
+                    <td><input value="1" type="text" name="green-price"  class="form-control row-size" id="row-size"></td>
+                  <td><input value="2" type="text" name="green-create" class="form-control row-size" id="row-size"></td>
+                  <td><input value="4" type="text" name="green-delete" class="form-control row-size" id="row-size"></td>
                   </tr>
                 <tr>
                     <th scope="row">4</th>
                     <td>Земля</td>
                     <td><div id="tail-erth-tb"></div></td>
-                    <td><input value="3"  type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
+                    <td><input value="2" type="text" name="erth-price"  class="form-control row-size" id="row-size"></td>
+                  <td><input value="3" type="text" name="erth-create" class="form-control row-size" id="row-size"></td>
+                  <td><input value="6" type="text" name="erth-delete" class="form-control row-size" id="row-size"></td>
                   </tr>
                 <tr>
                     <th scope="row">5</th>
                     <td>Застройка</td>
                     <td><div id="tail-building-tb"></div></td>
-                    <td><input value="5"  type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
-                    <td><input value="0" type="text" class="form-control row-size" id="row-size"></td>
+                    <td><input value="4" type="text" name="building-price"  class="form-control row-size" id="row-size"></td>
+                  <td><input value="6" type="text" name="building-create" class="form-control row-size" id="row-size"></td>
+                  <td><input value="9" type="text" name="building-delete" class="form-control row-size" id="row-size"></td>
                   </tr>
               </tbody>
         </table>
@@ -122,8 +122,37 @@
             <button id="start-game-btn" type="button" class="btn btn-primary" style="display:none;">Начать игру</button>
           </div>
         </div>
-        <div id="game">
+        <div id="game" style="display:none;">
+          <div class="row">
+              <div class="col-xs-4">
+                  <label for="" class="form-control-label " style="margin-left: 2%;">Счет:</label>
+                  <label id="count"  class="form-control-label " style="margin-left: 2%;">100</label>
+              </div>
+              <div class="col-xs-4">
+                  <label for="" class="form-control-label " style="margin-left: 2%;">Номер выборки:</label>
+                  <label id="itr_l"  class="form-control-label " style="margin-left: 2%;">1</label>
+              </div>
+              <div class="col-xs-4">
+                  <label for="" class="form-control-label " style="margin-left: 2%;">Номер иттерации:</label>
+                  <label id="itr" class="form-control-label " style="margin-left: 2%;">1</label>
+              </div>
+              <div class="col-xs-4">
+                  <label for="" class="form-control-label " style="margin-left: 2%;">Мера:</label>
+                  <label id="integrate" class="form-control-label " style="margin-left: 2%;">1</label>
+              </div>
+              <div class="col-xs-4">
+                  <button id="append-to-tmo" type="button" class="btn btn-primary" >Добавить текущие решение</button>
+              </div>
+          </div>
+          <div class="row">
+              <canvas  id='game-canvas' style="margin-top:20px;">Обновите</canvas>
+          </div>
+          <div class="row">
+            <div class="col-xs-2" id="current-elem">
 
+            </div>
+            <div class="col-xs-12"  id="game-status"> </div>
+          </div>
         </div>
     <script src="Jquery/jquery.js"></script>
     <script src="lesson3.js"></script>
@@ -149,6 +178,10 @@
   }
   .row-size{
     text-align: center;
+  }
+  #game-status {
+    display: inline-flex;
+    margin-top: 0px;
   }
   .map-container {
     margin-bottom: 30px;
@@ -230,6 +263,13 @@
     height:32px;
     background-color:rgb(59, 61, 65);   
     -webkit-border-radius: 5px 5px 5px 5px;
+  }
+  .empty_color{
+    width:32px;
+    height:32px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    margin-top: 32px;
+    margin-right: 20px;
   }
   #tail-green:hover{
     width:40px;

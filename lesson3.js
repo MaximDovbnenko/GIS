@@ -2,6 +2,8 @@
 var canvas_elem = document.getElementById('draw_obj');
 var Canvas      = canvas_elem.getContext('2d');
 var EditMode    = null;
+var GameObj     = null;
+
 var DefaultStart = [
     [2,2,2,1,1],
     [2,1,1,1,1],
@@ -112,12 +114,12 @@ MatrixGroup.prototype = {
         canvas_elem.width  = this.col_length * 24;
         this.Matrix = matrix;
     },
-    drawMatrix: function(){
+    drawMatrix: function(offset, context){
         for(var i = 0; i < this.row_length; i++){
             for(var j = 0; j < this.col_length; j++){
                 var current_group = this.Matrix[i][j];
-                Canvas.fillStyle  = this.cell_color[current_group];
-                Canvas.fillRect(j * this.cell_x_size, i * this.cell_y_size, this.cell_x_size, this.cell_y_size);
+                context.fillStyle  = this.cell_color[current_group];
+                context.fillRect(offset + (j * this.cell_x_size), i * this.cell_y_size, this.cell_x_size, this.cell_y_size);
             }
         }
     },
@@ -221,18 +223,24 @@ Edit.prototype = {
         $('#next-btn').on('click', function(){ $this.CreateEndMatrix();});
         $('#create-btn').on('click', function(){ $this.CreateStartMatrix();});
         $('#price-geo-btn').on('click', function(){$this.CreatePriceMatrix();});
-        $('#start-game-btn').on('click', function(){ $(".map").hide(1000);   $('#title-step').hide(); });
+        $('#start-game-btn').on('click', function(){ 
+            $(".map").hide(1000);   
+            $('#title-step').hide();
+            $("#game").show(1000);   
+            GameObj = new Game(); 
+            GameObj.init($this.StartMatrix, $this.EndMatrix, $this.PriceMatrix);
+        });
         $('#draw_obj').on('mousedown', function(e){
-            var m = mouse_coords(e);
+            var m = mouse_coords(e,canvas_elem);
             var i = Math.floor((m.x) / 24) ;       
             var j = Math.floor((m.y) / 24) ;   
             if($this.CurrentCreate == 'start'){
                 $this.StartMatrix.Matrix[j][i] =  $this.CurrentColor; 
-                $this.StartMatrix.drawMatrix();
+                $this.StartMatrix.drawMatrix(0, Canvas);
                 $this.ubdate_table($this.StartMatrix);
             }else if($this.CurrentCreate == 'end'){
                 $this.EndMatrix.Matrix[j][i] =  $this.CurrentColor; 
-                $this.EndMatrix.drawMatrix();
+                $this.EndMatrix.drawMatrix(0, Canvas);
                 $this.ubdate_table($this.EndMatrix);
             } else{
                 $this.PriceMatrix.Matrix[j][i]++;
@@ -260,7 +268,7 @@ Edit.prototype = {
             var start_group = this.StartMatrix.calculateGroup();
             $("#set-size").hide(1000);
             $(".map").show(1000);
-            this.StartMatrix.drawMatrix();
+            this.StartMatrix.drawMatrix(0, Canvas);
             this.ubdate_table(this.StartMatrix);
         }
     },
@@ -274,7 +282,7 @@ Edit.prototype = {
         var state = this.EndMatrix.CreateMatrix(row, col);
         if(state){
             var start_group = this.EndMatrix.calculateGroup();
-            this.EndMatrix.drawMatrix();
+            this.EndMatrix.drawMatrix(0, Canvas);
             this.ubdate_table(this.EndMatrix);
         }
     },
@@ -305,7 +313,7 @@ Edit.prototype = {
         this.StartMatrix.loadDefault(DefaultStart);
         $("#set-size").hide(1000);
         $(".map-container").show(1000);
-        this.StartMatrix.drawMatrix();
+        this.StartMatrix.drawMatrix(0, Canvas);
         this.ubdate_table(this.StartMatrix);
     },
     ubdate_table: function(current_matrix){
@@ -339,16 +347,196 @@ Edit.prototype = {
 
 
 function Game(){
-
+    this.CurrentMatrix = new MatrixGroup();
+    this.EndMatrix     = new MatrixGroup();
+    this.Price         = new MatrixGroup();
+    this.canvas_elem_local  = document.getElementById('game-canvas');
+    this.context            = this.canvas_elem_local.getContext('2d');
+    this.Group              = {
+        0: {
+            id:     0,
+            color:  '#616872',
+            price:  $('input[name="empty-price"]').val(),
+            delete: $('input[name="empty-create"]').val(),
+            create: $('input[name="empty-delete"]').val()
+        },
+        1: {
+            id:     1,
+            color:  '#0000FF',
+            price:  $('input[name="water-price"]').val(),
+            delete: $('input[name="water-create"]').val(),
+            create: $('input[name="water-delete"]').val()
+        },
+        2: {
+            id:     2,
+            color:  'rgb(238, 173, 9)',
+            price:  $('input[name="erth-price"]').val(),
+            delete: $('input[name="erth-create"]').val(),
+            create: $('input[name="erth-delete"]').val()
+        },
+        3: {
+            id:     3,
+            color:  'rgb(12, 47, 101)',
+            price:  $('input[name="building-price"]').val(),
+            delete: $('input[name="building-create"]').val(),
+            create: $('input[name="building-delete"]').val()
+        },
+        4: {
+            id:     4,
+            color:  'rgb(47, 228, 20)',
+            price:  $('input[name="green-price"]').val(),
+            delete: $('input[name="green-create"]').val(),
+            create: $('input[name="green-delete"]').val()
+        }
+    };
+    this.TmpMatrix = {
+        0: { tmp_matrix: this.CurrentMatrix },
+        1: { tmp_matrix: this.CurrentMatrix },
+        2: { tmp_matrix: this.CurrentMatrix },
+    }
+    this.game_current_block = $('#current-elem');
+    this.ITR_STEP  = 0;
+    this.STEP      = 0;
+    this.current_i = 0;
+    this.current_j = 0;
+    this.LocalCounter = 100;
 }
 Game.prototype = {
+    //Рисуем оба игровых поля
+    init: function(start_matrix, end_matrix, price){
+        var $this = this;
+        this.CurrentMatrix  = start_matrix;
+        this.EndMatrix      = end_matrix;
+        this.Price = price;
+        this.TmpMatrix = {
+            0: { tmp_matrix: this.CurrentMatrix },
+            1: { tmp_matrix: this.CurrentMatrix },
+            2: { tmp_matrix: this.CurrentMatrix },
+        }
+        $('#game-canvas').attr('height', ((this.CurrentMatrix.row_length * 24)));
+        $('#game-canvas').attr('width',  ((this.CurrentMatrix.row_length * 24) * 2) + 50);
+        $('#game-canvas').on('mousedown', function(e){
+            $this.update_state(e);
+        });
+        this.update();
+    },
+    _append_current_block: function(id){
+        var current_group = this.Group[id];
+        return $('<div>').css('background-color', current_group.color).addClass('empty_color');
+    },
+    _append_view: function(id){
+        $('#game-status').empty();
+        this.game_current_block.empty();
+        this._append_current_block(id).appendTo(this.game_current_block);
+        var $this = this;
+        var delete_btn = $('<button  type="button" class="btn btn-primary">Удалить</button>').on('click', function(){
+            $this.TmpMatrix[$this.ITR_STEP].tmp_matrix.Matrix[$this.current_j][$this.current_i] = 0;
+            $this.LocalCounter -= $this.Group[id].delete;
+            $('#game-status').empty();
+            $this.game_current_block.empty();
+            $this.update();
+        });
+        delete_btn.appendTo(this.game_current_block);
+        for(var key in $this.Group){
+            var div = $('<div>').css('margin-left', '20px');
+            if($this.Group[key].id == id || $this.Group[key].id == 0) { continue; }
+            var edt_btn = $('<button key="'+key+'" type="button" class="btn btn-primary">Вставить</button>').on('click', function(){
+                var i = $(this).attr('key');
+                $this.TmpMatrix[$this.ITR_STEP].tmp_matrix.Matrix[$this.current_j][$this.current_i] = $this.Group[i].id;
+                $this.LocalCounter -= $this.Group[i].create;
+                $('#game-status').empty();
+                $this.game_current_block.empty();
+                $this.update();
+            });
+            $this._append_current_block($this.Group[key].id).appendTo(div);
+            edt_btn.appendTo(div);
+            div.appendTo($('#game-status'));
+        }
+    },
+    update_state: function(e){
+        this.CurrentMatrix = this.TmpMatrix[this.ITR_STEP].tmp_matrix;
+        var m = mouse_coords(e, this.canvas_elem_local);
+        var i = Math.floor((m.x) / 24) ;       
+        var j = Math.floor((m.y) / 24) ; 
+        this.current_i = i;
+        this.current_j = j;
+        var current_mt_val = this.CurrentMatrix.Matrix[j][i];
+        this._append_view(current_mt_val);
+        this._append_current_block(current_mt_val);
+        this.update();
+    },
+    update: function(){
+        var integrate = this.calculate(this.CurrentMatrix);
+        $('#integrate').text(integrate);
+        $('#count').text(this.LocalCounter);
+        $('#itr_l').text(this.ITR_STEP);
+        $('#itr').text(this.STEP);
+        var offset = this.CurrentMatrix.col_length * this.CurrentMatrix.cell_x_size + 50;
+        this.CurrentMatrix.drawMatrix(0,  this.context);
+        this.EndMatrix.drawMatrix(offset, this.context);
+    },
+    calculate: function(matrix){
+        var lambda_1 = 0;
+        var calc_group_current = matrix.calculateGroup();
+        var calc_group_end     = matrix.calculateGroup();
+        for(var i = 0; i < matrix.row_length; i++){
+            for(var j = 0; j < matrix.col_length; j++){
+                if(matrix.Matrix[i][j] != this.EndMatrix.Matrix[i][j]){
+                    lambda_1++;
+                }
+            }
+        }
+        var lambda_2 = 0;
+        var lambda_3 = 0;
+        for(gr in this.Group){
+            var current_id = this.Group[gr].id;
+            var c_gr = 0;
+            var e_gr = 0;
+            var c_s = 0;
+            var e_s = 0;
+            for(var i = 0; i < calc_group_current.length; i++){
+                if(calc_group_current[i].id == current_id){
+                    c_gr++;
+                    c_s += calc_group_current[i].count;
+                }}
+            c_gr *= this.Group[gr].price;
+            c_s *= this.Group[gr].price;
+            for(var i = 0; i < calc_group_end.length; i++){
+                if(calc_group_end[i].id == current_id){
+                     e_gr++;
+                     e_s += calc_group_end[i].count;
+                 }}
+            e_gr *= this.Group[gr].price;
+            lambda_2 += Math.abs(c_gr - e_gr);
+            e_s *= this.Group[gr].price;
+            lambda_3 += Math.abs(e_s - c_s);
+        }
+        var lambda_4 = 0;
+        for(gr in this.Group){
+            var cr_0 = 0;
+            var cr_1 = 0;
+            var current_id = this.Group[gr].id;
+            for(var i = 0; i < matrix.row_length; i++){
+                for(var j = 0; j < matrix.col_length; j++){
+                    if(matrix.Matrix[i][j] == current_id){
+                        cr_0 += this.Price.Matrix[i][j] * this.Group[gr].price;
+                    }
+                    if(this.EndMatrix.Matrix[i][j] == current_id){
+                        cr_1 += this.Price.Matrix[i][j] * this.Group[gr].price;
+                    }
+                }
+            }
+            lambda_4 += Math.abs(cr_0 - cr_1);
+        }
+        return lambda_1 + lambda_2 + lambda_3 + lambda_4;
 
+    }
 };
 
 
-function mouse_coords(e) {                  // функция возвращает экранные координаты курсора мыши
+function mouse_coords(e, elem) {                  
     var m = [];
-    var rect = canvas_elem.getBoundingClientRect();
+    var rect = elem.getBoundingClientRect();
     m.x = e.clientX - rect.left;
     m.y = e.clientY - rect.top;
     return m;

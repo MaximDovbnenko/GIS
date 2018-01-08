@@ -26,12 +26,12 @@
         <div class="row">
           <div class="col-xs-4">
             <label for="recipient-name" class="form-control-label inp">Кол. строк</label>
-            <input value="16" type="text" class="form-control inp" id="row-size">
+            <input value="20" type="text" class="form-control inp" id="row-size">
           </div>
           <div class="col-xs-2" style="width:30px;"></div>
           <div class="col-xs-4">
             <label for="recipient-name" class="form-control-label inp">Кол.столбцов</label>
-            <input value="36" type="text" class="form-control inp" id="col-size">
+            <input value="20" type="text" class="form-control inp" id="col-size">
           </div>
           <div class="col-xs-4">
             <div class="checkbox">
@@ -105,25 +105,28 @@
         </div>
     </div>
       </div>
-        <div class="map-container" style="display:none;">
-          <div class="row">
+        <div class="map" style="display:none;">
+          <div class="row map-container">
                 <div id="tail-empty"></div>
                 <div id="tail-water"></div>
                 <div id="tail-erth"></div>
                 <div id="tail-building"></div>
                 <div id="tail-green"></div>
           </div>
-          <canvas height='640' width='640' id='draw_obj' style="margin-top:20px;">Обновите</canvas>
+          <input id="input-price" value="0" type="text" style="display:none;" class="form-control">
+          <canvas height='640' width='640' id='draw_obj' style="margin-top:20px; margin-left: 30%;">Обновите</canvas>
           <div class="row">
-             
+            <table id = "count-group-tb" class="table"></table>
+            <button id="next-btn" type="button" class="btn btn-primary">Далее</button>
+            <button id="price-geo-btn" type="button" class="btn btn-primary" style="display:none;">Создать карту ценности территории</button>
+            <button id="start-game-btn" type="button" class="btn btn-primary" style="display:none;">Начать игру</button>
           </div>
-          
         </div>
+        <div id="game">
 
-
+        </div>
     <script src="Jquery/jquery.js"></script>
     <script src="lesson3.js"></script>
-   
   </body>
 </html>
 
@@ -150,7 +153,7 @@
   .map-container {
     margin-bottom: 30px;
     background-color:rgb(198, 200, 203);
-    width: 370px;
+    width: 400px;
     height:74px;
     -webkit-border-radius: 5px 5px 5px 5px;
   }

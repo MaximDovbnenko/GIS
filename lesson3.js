@@ -138,6 +138,14 @@ MatrixGroup.prototype = {
     _get_random: function(min, max){
         return Math.round(Math.random() * (max - min) + min);
     },
+    copy: function(obj){
+        this.CreateMatrix(obj.row_length, obj.col_length);
+        for(var i = 0; i < this.row_length; i++){
+            for(var j = 0; j < this.col_length; j++){
+                this.Matrix[j][i] = obj.Matrix[j][i];
+            }
+        }
+    },
     //Расчет колличевства групп на карте
     calculateGroup: function(){
         var GroupResult = [];
@@ -348,6 +356,7 @@ Edit.prototype = {
 
 function Game(){
     this.CurrentMatrix = new MatrixGroup();
+    this.StartMatrix   = new MatrixGroup(); 
     this.EndMatrix     = new MatrixGroup();
     this.Price         = new MatrixGroup();
     this.canvas_elem_local  = document.getElementById('game-canvas');
@@ -389,30 +398,24 @@ function Game(){
             create: $('input[name="green-delete"]').val()
         }
     };
-    this.TmpMatrix = {
-        0: { tmp_matrix: this.CurrentMatrix },
-        1: { tmp_matrix: this.CurrentMatrix },
-        2: { tmp_matrix: this.CurrentMatrix },
-    }
+    this.TmpMatrix = [];
     this.game_current_block = $('#current-elem');
     this.ITR_STEP  = 0;
     this.STEP      = 0;
     this.current_i = 0;
     this.current_j = 0;
-    this.LocalCounter = 100;
+    this.LocalCounter = 50;
+    this.data = [];
 }
 Game.prototype = {
     //Рисуем оба игровых поля
     init: function(start_matrix, end_matrix, price){
         var $this = this;
-        this.CurrentMatrix  = start_matrix;
-        this.EndMatrix      = end_matrix;
+        this.CurrentMatrix.copy(start_matrix);
+        this.StartMatrix.copy(start_matrix) 
+        this.EndMatrix.copy(end_matrix);
         this.Price = price;
-        this.TmpMatrix = {
-            0: { tmp_matrix: this.CurrentMatrix },
-            1: { tmp_matrix: this.CurrentMatrix },
-            2: { tmp_matrix: this.CurrentMatrix },
-        }
+        
         $('#game-canvas').attr('height', ((this.CurrentMatrix.row_length * 24)));
         $('#game-canvas').attr('width',  ((this.CurrentMatrix.row_length * 24) * 2) + 50);
         $('#game-canvas').on('mousedown', function(e){
@@ -425,13 +428,37 @@ Game.prototype = {
     },
     _append_to_tmp: function(){
         var $this = this;
-        var integrate = this.calculate(this.TmpMatrix[this.ITR_STEP].tmp_matrix);
+        var integrate = this.calculate(this.CurrentMatrix);
         var row = $('<tr key='+ this.ITR_STEP  +'><th>Решение-'+ (this.ITR_STEP + 1) +'</th><td>'+ integrate +'</td><tr>').on('click', function(){
-
+            if(integrate ==0){
+                var i = $(this).attr('key');
+                $this.CurrentMatrix.copy($this.TmpMatrix[i]);
+                $this.data.push($this.calculate($this.TmpMatrix[i]));
+                show_chart($this.data);
+            }else{
+                $this.STEP++;
+                $this.ITR_STEP = 0;
+                var i = $(this).attr('key');
+                $this.CurrentMatrix.copy($this.TmpMatrix[i]);
+                $this.data.push($this.calculate($this.TmpMatrix[i]));
+                $this.StartMatrix.copy($this.TmpMatrix[i]);
+                $this.TmpMatrix = [];
+                $this.update();
+                $('tbody', $('#tmp-table')).empty();
+                $('#append-to-tmp').show();
+            }
         });
         row.appendTo($('tbody', $('#tmp-table')));
         this.ITR_STEP++;
-        this.TmpMatrix[$this.ITR_STEP].tmp_matrix = this.CurrentMatrix; 
+        if(this.ITR_STEP == 3){
+            $('#append-to-tmp').hide();
+        }
+        //this.CurrentMatrix = this.TmpMatrix[$this.ITR_STEP].tmp_matrix;
+        var tmp = new MatrixGroup();
+        tmp.copy(this.CurrentMatrix);
+        this.TmpMatrix.push(tmp);
+        this.CurrentMatrix.copy(this.StartMatrix);
+        this.LocalCounter = 50;
         this.update();
     },
     _append_current_block: function(id){
@@ -444,7 +471,7 @@ Game.prototype = {
         this._append_current_block(id).appendTo(this.game_current_block);
         var $this = this;
         var delete_btn = $('<button  type="button" class="btn btn-primary">Удалить</button>').on('click', function(){
-            $this.TmpMatrix[$this.ITR_STEP].tmp_matrix.Matrix[$this.current_j][$this.current_i] = 0;
+            $this.CurrentMatrix.Matrix[$this.current_j][$this.current_i] = 0;
             $this.LocalCounter -= $this.Group[id].delete;
             $('#game-status').empty();
             $this.game_current_block.empty();
@@ -456,7 +483,7 @@ Game.prototype = {
             if($this.Group[key].id == id || $this.Group[key].id == 0) { continue; }
             var edt_btn = $('<button key="'+key+'" type="button" class="btn btn-primary">Вставить</button>').on('click', function(){
                 var i = $(this).attr('key');
-                $this.TmpMatrix[$this.ITR_STEP].tmp_matrix.Matrix[$this.current_j][$this.current_i] = $this.Group[i].id;
+                $this.CurrentMatrix.Matrix[$this.current_j][$this.current_i] = $this.Group[i].id;
                 $this.LocalCounter -= $this.Group[i].create;
                 $('#game-status').empty();
                 $this.game_current_block.empty();
@@ -468,25 +495,24 @@ Game.prototype = {
         }
     },
     update_state: function(e){
-        this.CurrentMatrix = this.TmpMatrix[this.ITR_STEP].tmp_matrix;
         var m = mouse_coords(e, this.canvas_elem_local);
         var i = Math.floor((m.x) / 24) ;       
         var j = Math.floor((m.y) / 24) ; 
         this.current_i = i;
         this.current_j = j;
-        var current_mt_val = this.TmpMatrix[this.ITR_STEP].tmp_matrix.Matrix[j][i];
+        var current_mt_val = this.CurrentMatrix.Matrix[j][i];
         this._append_view(current_mt_val);
         this._append_current_block(current_mt_val);
         this.update();
     },
     update: function(){
-        var integrate = this.calculate(this.TmpMatrix[this.ITR_STEP].tmp_matrix);
+        var integrate = this.calculate(this.CurrentMatrix);
         $('#integrate').text(integrate);
         $('#count').text(this.LocalCounter);
         $('#itr_l').text(this.ITR_STEP);
         $('#itr').text(this.STEP);
         var offset = this.CurrentMatrix.col_length * this.CurrentMatrix.cell_x_size + 50;
-        this.TmpMatrix[this.ITR_STEP].tmp_matrix.drawMatrix(0,  this.context);
+        this.CurrentMatrix.drawMatrix(0,  this.context);
         this.EndMatrix.drawMatrix(offset, this.context);
     },
     calculate: function(matrix){
@@ -547,7 +573,20 @@ Game.prototype = {
     }
 };
 
-
+function show_chart(data){
+    var ctx = document.getElementById("myChart");
+    $('#game').hide(1000);
+    $('#chart').show();
+    
+    var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+          columns: [
+            data   
+          ]
+        }
+    });
+}
 function mouse_coords(e, elem) {                  
     var m = [];
     var rect = elem.getBoundingClientRect();
@@ -555,9 +594,7 @@ function mouse_coords(e, elem) {
     m.y = e.clientY - rect.top;
     return m;
 }
-function RGBtoHEX(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+
 
 
 
